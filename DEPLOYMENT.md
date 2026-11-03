@@ -22,7 +22,7 @@ The app does not fetch live market prices. Do not upload a dataset to a hosted a
 3. Use a Python version compatible with `requirements.txt`; choose the same Python version used for local development when available.
 4. Deploy and wait for the build to finish. If it fails, review the build logs and correct the reported dependency or application issue.
 5. Open the resulting `*.streamlit.app` address and confirm that the app loads. With no bundled dataset, confirm that it displays the upload workflow. Only call it ready for a full project demonstration after an authorized data workflow has been approved and verified.
-6. After the host issues a real URL, replace the placeholder in the presentation with that exact verified address. Never present `http://127.0.0.1:8501` as a public URL; it works only on the computer running the local app.
+6. The presentation already links to the verified hosted address: [Financial Risk Intelligence](https://financial-risk-intelligence-mfzjzfwa4itnzspf3r5skz.streamlit.app/). Never present `http://127.0.0.1:8501` as a public URL; it works only on the computer running the local app.
 
 ## Local run
 
@@ -37,9 +37,9 @@ See the [Streamlit deployment guide](https://docs.streamlit.io/deploy/streamlit-
 ## Current deployment
 
 - App: [Financial Risk Intelligence](https://financial-risk-intelligence-mfzjzfwa4itnzspf3r5skz.streamlit.app/)
-- Source: private GitHub repository, branch `main`, entrypoint `app.py`
-- Visibility: private on Streamlit Community Cloud
+- Source: [public GitHub repository](https://github.com/prabhatseemasingh/financial-risk-intelligence), branch `main`, entrypoint `app.py`
+- Visibility: public on Streamlit Community Cloud; the app is configured for access without a Streamlit sign-in
 - Verified behavior: the hosted page loads and shows the CSV upload workflow; no market data or saved research results are bundled.
 
-For a department presentation, either invite viewers in Streamlit or make the app public while keeping the GitHub source repository private. The public setting makes the app accessible to anyone with its URL. The viewer must still provide a CSV allowed for hosted use to run an analysis.
+For a department presentation, share the app link above. Viewers can open it without a Streamlit sign-in, then upload a CSV whose provider terms allow hosted use to run an analysis. The public GitHub repository contains application code and documentation only; collected market data and saved results are excluded.
 
