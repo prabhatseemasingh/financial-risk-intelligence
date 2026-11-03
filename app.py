@@ -22,7 +22,18 @@ st.set_page_config(
 )
 
 PROJECT_DIR = Path(__file__).resolve().parent
-PREPARED_DATA_PATH = PROJECT_DIR / "data" / "processed" / "market_data_aligned.csv"
+LOCAL_PREPARED_DATA_PATH = PROJECT_DIR / "data" / "processed" / "market_data_aligned.csv"
+PUBLIC_SAMPLE_DATA_PATH = PROJECT_DIR / "data" / "default_project_sample.csv"
+PREPARED_DATA_PATH = (
+    LOCAL_PREPARED_DATA_PATH
+    if LOCAL_PREPARED_DATA_PATH.is_file()
+    else PUBLIC_SAMPLE_DATA_PATH
+)
+PREPARED_SOURCE_NOTE = (
+    "NIFTY 50 Gross TRI, Nifty 10 Yr Benchmark G-Sec, and split-adjusted Gold BeES Growth NAV; "
+    "exact common trading dates; Gold BeES pre-2019-12-23 NAV divided by 100 per NSE circular CML42873; "
+    "sources and limitations documented in data/DEFAULT_SAMPLE_SOURCE.md."
+)
 SAVED_RUN_DIR = PROJECT_DIR / "results" / "run_2026-11-03_default"
 SAVED_REGIMES_PATH = SAVED_RUN_DIR / "descriptive_regimes.csv"
 SAVED_SUMMARY_PATH = SAVED_RUN_DIR / "run_summary.json"
@@ -145,16 +156,17 @@ st.title("Financial Risk Intelligence")
 st.caption("Research prototype for high-volatility forecasting and risk-responsive portfolio evaluation")
 st.warning(
     "Educational research tool only. It does not provide investment advice, execute trades, "
-    "or guarantee future performance. No market data is bundled with this application."
+    "or guarantee future performance. The aligned project sample is loaded by default; new uploads "
+    "refresh the analysis for your session only."
 )
 
 with st.sidebar:
     st.header("1. Add verified data")
     use_prepared_data = st.checkbox(
-        "Use the prepared local project sample",
-        value=PREPARED_DATA_PATH.is_file() and not SAVED_REGIMES.empty,
+        "Use the prepared project sample (2015–2026)",
+        value=PREPARED_DATA_PATH.is_file(),
         disabled=not PREPARED_DATA_PATH.is_file(),
-        help="Loads the aligned project CSV and matching saved forecast, portfolio and regime outputs without rerunning the model.",
+        help="Loads the aligned common-date project CSV. Uncheck this option to upload a newer CSV.",
     )
     uploaded = st.file_uploader(
         "Upload a CSV of daily index or adjusted-price levels",
@@ -190,11 +202,8 @@ with st.sidebar:
             upload_hash = hashlib.sha256(raw_bytes).hexdigest()
             input_name = PREPARED_DATA_PATH.name
             raw = pd.read_csv(BytesIO(raw_bytes))
-            source_note = (
-                "User-provided NIFTY 50 Gross TRI, Nifty 10 Yr Benchmark G-Sec, and split-adjusted "
-                "Gold BeES Growth NAV; exact common dates; local academic research use."
-            )
-            st.caption("Using the aligned project sample. Public redistribution rights are not established.")
+            source_note = PREPARED_SOURCE_NOTE
+            st.caption("Using the prepared sample; see Data and method for its date range and source notes.")
         except Exception as exc:
             st.error(f"Could not load the prepared project data: {exc}")
     elif uploaded is not None:
@@ -252,6 +261,7 @@ with st.sidebar:
                 st.session_state["mapping_signature"] = mapping_signature
                 st.session_state.pop("research_result", None)
                 st.session_state.pop("research_result_signature", None)
+                st.session_state.pop("attempted_run_signature", None)
                 st.session_state.pop("data_report", None)
                 st.session_state.pop("prepared_data", None)
             if rights_confirmed:
@@ -282,8 +292,9 @@ with st.sidebar:
     validation_folds = st.selectbox("Development folds", [3, 2], index=0)
     cost_bps = st.selectbox("Base transaction-cost assumption", [10, 5, 25], index=0)
     st.caption("These are research assumptions. Agree on them before interpreting results.")
+    st.caption("After data and source confirmation, analysis refreshes automatically when the file, column mapping, or settings change. Uploaded files are processed for this session and do not replace the shared sample.")
     run_clicked = st.button(
-        "Run walk-forward analysis",
+        "Run / refresh walk-forward analysis",
         type="primary",
         disabled=prices is None or not source_note.strip(),
     )
@@ -292,6 +303,7 @@ if upload_hash is not None and st.session_state.get("upload_hash") != upload_has
     st.session_state["upload_hash"] = upload_hash
     st.session_state.pop("research_result", None)
     st.session_state.pop("research_result_signature", None)
+    st.session_state.pop("attempted_run_signature", None)
     st.session_state.pop("data_report", None)
     st.session_state.pop("prepared_data", None)
 if upload_hash is None:
@@ -299,12 +311,21 @@ if upload_hash is None:
     st.session_state.pop("mapping_signature", None)
     st.session_state.pop("research_result", None)
     st.session_state.pop("research_result_signature", None)
+    st.session_state.pop("attempted_run_signature", None)
     st.session_state.pop("data_report", None)
     st.session_state.pop("prepared_data", None)
 
 run_signature = (
     hashlib.sha256(
-        repr((upload_hash, holdout_sessions, validation_sessions, validation_folds, float(cost_bps), PIPELINE_CODE_HASH)).encode("utf-8")
+        repr((
+            upload_hash,
+            st.session_state.get("mapping_signature"),
+            holdout_sessions,
+            validation_sessions,
+            validation_folds,
+            float(cost_bps),
+            PIPELINE_CODE_HASH,
+        )).encode("utf-8")
     ).hexdigest()
     if upload_hash is not None
     else None
@@ -319,7 +340,16 @@ if (
 if prices is not None and report is not None:
     st.session_state["prepared_data"] = prices
     st.session_state["data_report"] = report
-if run_clicked and prices is not None:
+auto_run = (
+    prices is not None
+    and report is not None
+    and bool(source_note.strip())
+    and run_signature is not None
+    and st.session_state.get("research_result_signature") != run_signature
+    and st.session_state.get("attempted_run_signature") != run_signature
+)
+if (run_clicked or auto_run) and prices is not None:
+    st.session_state["attempted_run_signature"] = run_signature
     try:
         with st.spinner("Building features, selecting a model on development folds, and scoring the final holdout…"):
             result = run_research(
@@ -393,9 +423,9 @@ with tabs[0]:
     st.caption("Series are rebased to 100 at the first common date. The display is thinned for responsiveness; calculations use every aligned daily row. Confirm each series is a total-return or adjusted-return level before comparing them.")
     if result is None:
         if upload_hash == PREPARED_DATA_HASH and not SAVED_REGIMES.empty:
-            st.info("Saved descriptive clusters are available in the Regimes tab. Run the analysis to create a forecast, holdout evaluation and portfolio comparison for the selected settings.")
+            st.info("Saved descriptive clusters are available in the Regimes tab. The forecast, holdout evaluation and portfolio comparison will appear after the analysis finishes.")
         else:
-            st.info("No model run is stored for this input. Choose settings and run the analysis from the left panel.")
+            st.info("The analysis is starting for this data and these settings. It will rerun automatically when they change.")
     else:
         latest_cols = st.columns(3)
         latest_cols[0].metric("Current high-risk probability", f"{result.current_probability:.1%}")
@@ -530,7 +560,11 @@ with tabs[4]:
         "- [scikit-learn time-series cross-validation](https://scikit-learn.org/stable/modules/cross_validation.html#time-series-split)\n"
         "- [Streamlit Community Cloud dependencies](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/app-dependencies)"
     )
-    st.error("No live prices are fetched. The app reports only calculations from the uploaded file and labels the date of the latest input.")
+    st.markdown(
+        "[Default sample preparation record, source fingerprints and Gold BeES adjustment]("
+        "https://github.com/prabhatseemasingh/financial-risk-intelligence/blob/main/data/DEFAULT_SAMPLE_SOURCE.md)."
+    )
+    st.error("No live prices are fetched. The app reports only calculations from the selected input file and labels the date of the latest data.")
 
 st.divider()
 st.caption("Research prototype. Verify data rights and assumptions. Historical results do not predict future performance.")
