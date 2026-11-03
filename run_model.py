@@ -15,7 +15,7 @@ from risk_intelligence.evaluation import run_research
 
 
 PROJECT = Path(__file__).resolve().parent
-DEFAULT_INPUT = PROJECT / "data" / "processed" / "market_data_aligned.csv"
+DEFAULT_INPUT = PROJECT / "data" / "default_project_sample.csv"
 DEFAULT_OUTPUT = PROJECT / "results" / "run_2026-11-03_default"
 
 
@@ -43,6 +43,14 @@ def json_safe(value):
     return value
 
 
+def project_path(path: Path, label: str) -> Path:
+    """Resolve a CLI path and keep reads/writes inside the project directory."""
+    resolved = path.resolve()
+    if not resolved.is_relative_to(PROJECT.resolve()):
+        raise ValueError(f"{label} must be inside the project folder: {path}")
+    return resolved
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Train and evaluate the financial risk research model.")
     parser.add_argument("--input", type=Path, default=DEFAULT_INPUT)
@@ -53,10 +61,12 @@ def main() -> None:
     parser.add_argument("--cost-bps", type=float, default=10.0)
     args = parser.parse_args()
 
-    if not args.input.is_file():
-        raise FileNotFoundError(f"Prepared input file not found: {args.input}")
+    input_path = project_path(args.input, "Input data path")
+    output_dir = project_path(args.output_dir, "Output directory")
+    if not input_path.is_file():
+        raise FileNotFoundError(f"Prepared input file not found: {input_path}")
 
-    raw = pd.read_csv(args.input)
+    raw = pd.read_csv(input_path)
     prices, data_report = prepare_market_data(
         raw,
         date_column="Date",
@@ -76,7 +86,6 @@ def main() -> None:
     regime_fit_through = fitted_regime_rows.index.max() if not fitted_regime_rows.empty else None
     regime_counts = result.regimes["regime"].value_counts().sort_index().to_dict() if not result.regimes.empty else {}
 
-    output_dir = args.output_dir.resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
     (output_dir / "portfolio_weights").mkdir(exist_ok=True)
 
@@ -116,8 +125,8 @@ def main() -> None:
         },
         "cost_bps": result.cost_bps,
         "data": {
-            "file": str(args.input.resolve()),
-            "sha256": sha256(args.input),
+            "file": input_path.relative_to(PROJECT.resolve()).as_posix(),
+            "sha256": sha256(input_path),
             "rows_used": data_report.rows_used,
             "start_date": data_report.start_date.strftime("%Y-%m-%d"),
             "end_date": data_report.end_date.strftime("%Y-%m-%d"),
@@ -184,7 +193,7 @@ def main() -> None:
     (output_dir / "README.md").write_text("\n".join(report_lines) + "\n", encoding="utf-8")
 
     print(json.dumps({
-        "output_dir": str(output_dir),
+        "output_dir": output_dir.relative_to(PROJECT.resolve()).as_posix(),
         "selected_model": result.selected_model,
         "holdout_start": result.holdout_predictions.index.min().strftime("%Y-%m-%d"),
         "holdout_end": result.holdout_predictions.index.max().strftime("%Y-%m-%d"),
@@ -196,4 +205,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
