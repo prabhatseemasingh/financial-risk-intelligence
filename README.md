@@ -11,6 +11,7 @@ An India-focused research application for forecasting a future high-volatility e
 - Dashboard plots thin long daily histories for browser responsiveness; model calculations and downloaded regime/forecast/portfolio files retain the complete daily series. The regime plot keeps regime changes and every higher-volatility cluster point visible.
 - The Streamlit Community Cloud app and GitHub repository are public. The prepared, aligned sample is publicly available in the repository and loaded by the app; no saved analysis results or original provider exports are bundled.
 - The user confirmed permission to host this prepared sample in the public app on 2026-11-03. This is a project-specific confirmation, not a statement that other provider downloads may be redistributed. Check source terms before publishing replacement data.
+- The hosted app reads its bundled sample or the one CSV a visitor explicitly selects. Its code does not scan the visitor's computer, open other local paths, run uploaded content as code, or save uploads to disk or GitHub. The selected CSV is sent to Streamlit Community Cloud for processing; do not upload personal or sensitive files. Uploads are limited to 10 MB, 10,000 data rows, and 50 columns.
 - Historical results are research outputs, not investment advice or a promise of future performance.
 
 ## Run locally on Windows
@@ -21,7 +22,7 @@ Use Python 3.12 or a compatible version for the pinned packages. From the projec
 python -m streamlit run app.py
 ```
 
-Open `http://127.0.0.1:8501` on the same computer. This is a local demo address, not a public deployment URL. The presentation links to the hosted Streamlit app below; use that address for a remote demonstration.
+Streamlit opens the local app in a browser on the same computer. This local session is separate from the public hosted app linked below; use the hosted app for a remote demonstration.
 
 For a fresh Python installation that includes `ensurepip`, create an environment and install the pinned packages:
 
@@ -37,7 +38,7 @@ On macOS or Linux, create a Python 3.13 virtual environment, install `requiremen
 
 ## Data file
 
-Upload a CSV with one row per trading session. The app lets you map the columns, so source column names can differ. Required content:
+Upload one CSV with one row per trading session. The app lets you map the columns, so source column names can differ. Uploads are limited to 10 MB, 10,000 data rows, and 50 columns. Required content:
 
 | Field | Meaning |
 |---|---|
@@ -47,7 +48,7 @@ Upload a CSV with one row per trading session. The app lets you map the columns,
 | Gold level | Adjusted INR level for a documented domestic gold ETF or other domestic-gold proxy |
 | India VIX | Optional risk feature, if available and timestamp-aligned |
 
-`data/default_project_sample.csv` is used on first open. `data/market_data_template.csv` gives the canonical header names for replacement uploads. Use adjusted or total-return levels consistently. For the flagship comparison, prefer an equity TRI, a government-bond total-return index and a corporate-action-adjusted domestic gold ETF price series. ETF NAV is a fund proxy; it is not an executable ETF exchange price or spot-gold return. Do not mix an unadjusted equity price index with total-return series. The app sorts dates, rejects duplicate dates and excludes rows missing a required asset level. It never interpolates prices.
+`data/default_project_sample.csv` is used on first open. `data/market_data_template.csv` gives the canonical header names for replacement uploads. The hosted app processes only the file a visitor chooses; it does not read another file from the visitor's device. Use adjusted or total-return levels consistently. For the flagship comparison, prefer an equity TRI, a government-bond total-return index and a corporate-action-adjusted domestic gold ETF price series. ETF NAV is a fund proxy; it is not an executable ETF exchange price or spot-gold return. Do not mix an unadjusted equity price index with total-return series. The app sorts dates, rejects duplicate dates and excludes rows missing a required asset level. It never interpolates prices.
 
 If official downloads arrive as separate files, `prepare_data.py` combines them on exact matching dates and writes a SHA-256 source manifest. It does not contact data providers or fill missing values. Example command shape:
 
@@ -92,4 +93,3 @@ For a first study run, aim for at least ten years of aligned daily observations.
 ## Deployment
 
 The [live Streamlit app](https://financial-risk-intelligence-mfzjzfwa4itnzspf3r5skz.streamlit.app/) is public, and the [GitHub source repository](https://github.com/prabhatseemasingh/financial-risk-intelligence) is public. The app loads the prepared sample and runs the analysis automatically; uploaded files refresh analysis for the current session only. See [`DEPLOYMENT.md`](DEPLOYMENT.md) and the [sample source note](data/DEFAULT_SAMPLE_SOURCE.md) for details.
-
