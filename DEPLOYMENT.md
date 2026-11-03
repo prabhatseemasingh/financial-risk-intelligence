@@ -34,3 +34,12 @@ python -m streamlit run app.py
 
 See the [Streamlit deployment guide](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy) and [dependency guide](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/app-dependencies) for current host instructions.
 
+## Current deployment
+
+- App: [Financial Risk Intelligence](https://financial-risk-intelligence-mfzjzfwa4itnzspf3r5skz.streamlit.app/)
+- Source: private GitHub repository, branch `main`, entrypoint `app.py`
+- Visibility: private on Streamlit Community Cloud
+- Verified behavior: the hosted page loads and shows the CSV upload workflow; no market data or saved research results are bundled.
+
+For a department presentation, either invite viewers in Streamlit or make the app public while keeping the GitHub source repository private. The public setting makes the app accessible to anyone with its URL. The viewer must still provide a CSV allowed for hosted use to run an analysis.
+
