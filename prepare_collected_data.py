@@ -9,10 +9,6 @@ import pandas as pd
 
 
 PROJECT = Path(__file__).resolve().parent
-DOWNLOADS = Path.home() / "Downloads"
-DEFAULT_GOLD = DOWNLOADS / "Nippon India ETF Gold BeES.csv"
-DEFAULT_EQUITY = DOWNLOADS / "NIFTY 50 Total Returns Index (Gross).csv"
-DEFAULT_BOND = DOWNLOADS / "Nifty 10 Yr Benchmark G-Sec.csv"
 DEFAULT_OUTPUT = PROJECT / "data" / "processed" / "market_data_aligned.csv"
 SPLIT_EFFECTIVE_DATE = pd.Timestamp("2019-12-19")
 FIRST_POST_SPLIT_NAV_DATE = pd.Timestamp("2019-12-23")
@@ -97,11 +93,15 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Validate and exact-date-align the three collected project CSVs."
     )
-    parser.add_argument("--gold", type=Path, default=DEFAULT_GOLD)
-    parser.add_argument("--equity", type=Path, default=DEFAULT_EQUITY)
-    parser.add_argument("--bond", type=Path, default=DEFAULT_BOND)
+    parser.add_argument("--gold", type=Path, required=True, help="Explicit path to the Gold BeES source CSV.")
+    parser.add_argument("--equity", type=Path, required=True, help="Explicit path to the NIFTY TRI source CSV.")
+    parser.add_argument("--bond", type=Path, required=True, help="Explicit path to the G-Sec source CSV.")
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     args = parser.parse_args()
+    output_path = args.output.resolve()
+    if not output_path.is_relative_to(PROJECT.resolve()):
+        parser.error("--output must point to a file inside the project folder.")
+    args.output = output_path
 
     gold, gold_info = read_series(
         args.gold,
@@ -168,7 +168,7 @@ def main() -> None:
     inputs = {"gold": gold_info, "equity": equity_info, "bond": bond_info}
     details = {
         "created_utc": pd.Timestamp.now(tz="UTC").isoformat(),
-        "output_file": str(args.output.resolve()),
+        "output_file": args.output.relative_to(PROJECT.resolve()).as_posix(),
         "output_sha256": sha256(args.output),
         "rows_used": int(len(aligned)),
         "start_date": str(aligned["Date"].iloc[0]),
@@ -187,15 +187,15 @@ def main() -> None:
             "adjustment_rule": f"Divide NAV observations dated before {FIRST_POST_SPLIT_NAV_DATE:%Y-%m-%d} by {GOLD_SPLIT_FACTOR:g}; the supplied file remains on the old unit basis through 2019-12-20 and first shows the new unit basis on 2019-12-23.",
             "classification": "Corporate-action unit adjustment; not an imputed observation.",
         },
-        "source_rights_status": "User reports permission to train the project model, confirmed in conversation on 2026-11-03. Permission for public redistribution or deployment of raw data is not established by that confirmation.",
+        "source_rights_status": "The user confirmed permission to train the project model and to host the exact prepared aligned sample publicly on 2026-11-03. This does not extend to the original provider exports or other data.",
         "inputs": inputs,
     }
     manifest_path = args.output.with_name("data_manifest.json")
     manifest_path.write_text(json.dumps(details, indent=2), encoding="utf-8")
 
     print(json.dumps({
-        "output": str(args.output.resolve()),
-        "manifest": str(manifest_path.resolve()),
+        "output": args.output.relative_to(PROJECT.resolve()).as_posix(),
+        "manifest": manifest_path.relative_to(PROJECT.resolve()).as_posix(),
         "rows_used": len(aligned),
         "first_date": aligned["Date"].iloc[0],
         "last_date": aligned["Date"].iloc[-1],
@@ -206,4 +206,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
