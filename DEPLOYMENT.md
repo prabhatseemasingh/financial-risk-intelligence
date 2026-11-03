@@ -1,45 +1,44 @@
 # GitHub and Streamlit deployment
 
-GitHub stores the project's source files. Streamlit Community Cloud runs the live Streamlit application. A GitHub repository by itself does not create a running app.
+GitHub contains the source code and the prepared public project sample. Streamlit Community Cloud runs the live application.
 
-## What this project publishes
+## Public files and data
 
-The repository is designed to contain the application code, documentation, dependency list and empty CSV template. It excludes prepared market data, research archives, saved predictions, portfolio results, local environments and credentials. The public app therefore starts without the private/local project sample and asks the viewer to upload an authorized CSV before analysis.
+The repository includes `data/default_project_sample.csv`, an aligned common-date dataset of 2,709 observations from 2015-11-02 to 2026-10-30. Its complete preparation record is in [`data/DEFAULT_SAMPLE_SOURCE.md`](data/DEFAULT_SAMPLE_SOURCE.md). The user confirmed public hosted use of this prepared sample on 2026-11-03.
 
-The app does not fetch live market prices. Do not upload a dataset to a hosted app unless its provider's terms and your permissions allow that use. The project currently has permission to train on its collected data; public redistribution and hosted-app upload permissions have not been established.
+The original three provider exports, local source manifest, research archives, saved run outputs, local environments and credentials are excluded. The application calculates its output from the prepared data; it does not hard-code saved performance results or fetch live market prices.
 
-## Prepare the GitHub repository
+## What a visitor sees
 
-1. Create a repository in your GitHub account. Choose **Private** if you want to control who can see the source. Choose **Public** only if you are comfortable making the code and documentation visible to anyone. Keep the data files out of either repository.
-2. Put the contents of this `financial-risk-intelligence` folder at the repository root. The entrypoint is `app.py` and dependencies are listed in `requirements.txt`.
-3. Before publishing, inspect the selected files. Do not add `data/processed/market_data_aligned.csv`, `data/processed/data_manifest.json`, anything under `data/research_inputs/`, anything under `results/`, `.venv/`, or credential files.
-4. Push the reviewed source files to the repository's default branch (commonly `main`).
+1. Opening the public app loads the prepared sample and starts the walk-forward model analysis automatically.
+2. To try a newer dataset, uncheck **Use the prepared project sample**, upload a daily CSV, map its date/equity/bond/gold columns, enter a source note, and confirm that the data is authorized and comparable.
+3. Once confirmed, the app aligns the dates and automatically reruns when the uploaded file, mapping, or evaluation settings change.
+4. The uploaded file and its results stay within that visitor's current app session; they do not overwrite the shared sample or update the code. Replacing the default for all visitors requires reviewing and publishing a replacement sample in the repository.
 
-## Deploy with Streamlit Community Cloud
+The app sorts valid observations, rejects duplicate dates, excludes rows with missing or non-numeric required levels and never interpolates them. Use total-return or adjusted levels consistently. Do not use provider data in another hosted demo unless its terms and your permissions allow that use.
 
-1. Sign in at [share.streamlit.io](https://share.streamlit.io/) using GitHub and grant the access needed for the repository you chose.
-2. Select **Create app**, then select the repository, branch and `app.py` entrypoint.
-3. Use a Python version compatible with `requirements.txt`; choose the same Python version used for local development when available.
-4. Deploy and wait for the build to finish. If it fails, review the build logs and correct the reported dependency or application issue.
-5. Open the resulting `*.streamlit.app` address and confirm that the app loads. With no bundled dataset, confirm that it displays the upload workflow. Only call it ready for a full project demonstration after an authorized data workflow has been approved and verified.
-6. The presentation already links to the verified hosted address: [Financial Risk Intelligence](https://financial-risk-intelligence-mfzjzfwa4itnzspf3r5skz.streamlit.app/). Never present `http://127.0.0.1:8501` as a public URL; it works only on the computer running the local app.
-
-## Local run
-
-From this folder, install the pinned packages in `requirements.txt` and run:
-
-```powershell
-python -m streamlit run app.py
-```
-
-See the [Streamlit deployment guide](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy) and [dependency guide](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/app-dependencies) for current host instructions.
-
-## Current deployment
+## Current public deployment
 
 - App: [Financial Risk Intelligence](https://financial-risk-intelligence-mfzjzfwa4itnzspf3r5skz.streamlit.app/)
 - Source: [public GitHub repository](https://github.com/prabhatseemasingh/financial-risk-intelligence), branch `main`, entrypoint `app.py`
-- Visibility: public on Streamlit Community Cloud; the app is configured for access without a Streamlit sign-in
-- Verified behavior: the hosted page loads and shows the CSV upload workflow; no market data or saved research results are bundled.
+- Visibility: public; the app does not require visitors to sign in
+- Default input: `data/default_project_sample.csv`
 
-For a department presentation, share the app link above. Viewers can open it without a Streamlit sign-in, then upload a CSV whose provider terms allow hosted use to run an analysis. The public GitHub repository contains application code and documentation only; collected market data and saved results are excluded.
+GitHub changes to `main` trigger the connected Streamlit app to rebuild. After each change, wait for the deployment to finish and open the public app to verify the result. Do not share `http://127.0.0.1:8501` as it is available only on the computer running the local app.
+
+## Run locally
+
+From this project folder, install the packages pinned in `requirements.txt` and run:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+python -m streamlit run app.py
+```
+
+The application opens at `http://127.0.0.1:8501` on that computer. The same default sample and upload workflow are available.
+
+For host-specific details, see Streamlit's [deployment guide](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy) and [dependency guide](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/app-dependencies).
 
