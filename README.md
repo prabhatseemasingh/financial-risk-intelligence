@@ -1,15 +1,16 @@
 # Financial Risk Intelligence
 
-An India-focused research application for forecasting a future high-volatility event and testing a simple risk-responsive portfolio rule. It runs locally in Streamlit and uses an authorized data file supplied by the user.
+An India-focused research application for forecasting a future high-volatility event and testing a simple risk-responsive portfolio rule. The public Streamlit app opens on the prepared project sample; viewers can upload a newer authorized CSV to recalculate the analysis for their session.
 
 ## Current state
 
 - Application and model pipeline are implemented.
-- The local research workspace contains a prepared sample and saved analysis outputs. The input data, source manifest, research archives and generated results are excluded from GitHub.
-- In the local workspace, the app can restore saved outputs when the prepared sample and evaluation settings match. A clean GitHub clone has no bundled sample: upload an authorized CSV and run the analysis there.
+- The aligned 2015-11-02 to 2026-10-30 project sample is included at [`data/default_project_sample.csv`](data/default_project_sample.csv) and is loaded by default. Its source, exact-date alignment, exclusions, Gold BeES adjustment, and file fingerprints are documented in [`data/DEFAULT_SAMPLE_SOURCE.md`](data/DEFAULT_SAMPLE_SOURCE.md).
+- The original provider exports, local source manifest, research archives and saved analysis outputs are excluded from GitHub. The app calculates its forecast and portfolio analysis from the bundled sample when it opens; no performance results are hard-coded into the public app.
+- A new upload, changed column mapping, or changed evaluation setting triggers a fresh analysis. The upload affects that visitor's current session and does not replace the shared sample for other visitors. To update the shared default, prepare and publish a new reviewed sample file.
 - Dashboard plots thin long daily histories for browser responsiveness; model calculations and downloaded regime/forecast/portfolio files retain the complete daily series. The regime plot keeps regime changes and every higher-volatility cluster point visible.
-- The Streamlit Community Cloud app and GitHub repository are public. The hosted app shows the CSV-upload workflow; it contains no market data, source manifest or saved results.
-- Permission to publish or redistribute the raw market data was not established. The public app and repository contain code and documentation only; viewers must upload a CSV whose terms allow hosted use.
+- The Streamlit Community Cloud app and GitHub repository are public. The prepared, aligned sample is publicly available in the repository and loaded by the app; no saved analysis results or original provider exports are bundled.
+- The user confirmed permission to host this prepared sample in the public app on 2026-11-03. This is a project-specific confirmation, not a statement that other provider downloads may be redistributed. Check source terms before publishing replacement data.
 - Historical results are research outputs, not investment advice or a promise of future performance.
 
 ## Run locally on Windows
@@ -20,7 +21,7 @@ Use Python 3.12 or a compatible version for the pinned packages. From the projec
 python -m streamlit run app.py
 ```
 
-Open `http://127.0.0.1:8501` on the same computer. This is a local demo address, not a public deployment URL. The presentation links to the hosted Streamlit app below; use that address for a remote demonstration. The local address works only on this computer.
+Open `http://127.0.0.1:8501` on the same computer. This is a local demo address, not a public deployment URL. The presentation links to the hosted Streamlit app below; use that address for a remote demonstration.
 
 For a fresh Python installation that includes `ensurepip`, create an environment and install the pinned packages:
 
@@ -46,7 +47,7 @@ Upload a CSV with one row per trading session. The app lets you map the columns,
 | Gold level | Adjusted INR level for a documented domestic gold ETF or other domestic-gold proxy |
 | India VIX | Optional risk feature, if available and timestamp-aligned |
 
-`data/market_data_template.csv` gives the canonical header names. It has no observations. Use adjusted or total-return levels consistently. For the flagship comparison, prefer an equity TRI, a government-bond total-return index and a corporate-action-adjusted domestic gold ETF price series. ETF prices are a tradable proxy with tracking costs and market-price effects; they are not spot-gold returns. Do not mix an unadjusted equity price index with total-return series. The app sorts dates, rejects duplicate dates and excludes rows missing a required asset level. It never interpolates prices.
+`data/default_project_sample.csv` is used on first open. `data/market_data_template.csv` gives the canonical header names for replacement uploads. Use adjusted or total-return levels consistently. For the flagship comparison, prefer an equity TRI, a government-bond total-return index and a corporate-action-adjusted domestic gold ETF price series. ETF NAV is a fund proxy; it is not an executable ETF exchange price or spot-gold return. Do not mix an unadjusted equity price index with total-return series. The app sorts dates, rejects duplicate dates and excludes rows missing a required asset level. It never interpolates prices.
 
 If official downloads arrive as separate files, `prepare_data.py` combines them on exact matching dates and writes a SHA-256 source manifest. It does not contact data providers or fill missing values. Example command shape:
 
@@ -65,7 +66,7 @@ Replace file paths and column names with the actual downloaded files. Inspect th
 - NSE's [historical reports area](https://www.nseindia.com/resources/historical-reports-capital-market-daily-monthly-archives) links to historical indices, Total Returns Index values, India VIX and ETF price archives. For bonds, the Nifty Indices [historical-data page](https://www.niftyindices.com/reports/historical-data) states that fixed-income indices are total-return indices except the separately named NIFTY 10 Yr Benchmark G-Sec (Clean Price). Use the ordinary NIFTY 10 Yr Benchmark G-Sec series only after confirming the downloaded column and date range. NSE explains why equity benchmarks should use the [NIFTY Total Returns Index](https://www.nseindia.com/static/products-services/indices-faqs).
 - RBI's [Database on Indian Economy](https://dbie.rbi.org.in/) is a source to review for supplemental official Indian financial series.
 - For gold, select an official or otherwise authorized domestic-gold series. If using an NSE-listed gold ETF, download daily prices from its ETF archive, adjust for corporate actions, and document the ETF symbol, currency, adjustment method and retrieval date. Record exact series, source terms and transformations in the app's source note.
-- The app does not download data automatically. Check each provider's access and reuse terms before downloading, storing, deploying or sharing data.
+- The app does not download data automatically. The public sample's source and adjustment record is [documented here](data/DEFAULT_SAMPLE_SOURCE.md). Check each provider's access and reuse terms before downloading, storing, deploying or sharing replacement series.
 
 For a first study run, aim for at least ten years of aligned daily observations. The default design uses a three-year final holdout, three one-year development folds, 21-session forward labels, and a 21-session purge. The exact data history depends on series availability and licensing; inspect the aligned date range before committing to this design. If the app reports insufficient history, obtain more data or get supervisor approval before changing the windows.
 
@@ -90,5 +91,5 @@ For a first study run, aim for at least ten years of aligned daily observations.
 
 ## Deployment
 
-The [live Streamlit app](https://financial-risk-intelligence-mfzjzfwa4itnzspf3r5skz.streamlit.app/) is public, and the [GitHub source repository](https://github.com/prabhatseemasingh/financial-risk-intelligence) is public. The app was verified to load its CSV-upload workflow; neither the app nor repository contains the collected market data, source manifest, or saved results. Upload only a CSV whose provider terms and permissions allow hosted-app use. See [`DEPLOYMENT.md`](DEPLOYMENT.md) for deployment details.
+The [live Streamlit app](https://financial-risk-intelligence-mfzjzfwa4itnzspf3r5skz.streamlit.app/) is public, and the [GitHub source repository](https://github.com/prabhatseemasingh/financial-risk-intelligence) is public. The app loads the prepared sample and runs the analysis automatically; uploaded files refresh analysis for the current session only. See [`DEPLOYMENT.md`](DEPLOYMENT.md) and the [sample source note](data/DEFAULT_SAMPLE_SOURCE.md) for details.
 
