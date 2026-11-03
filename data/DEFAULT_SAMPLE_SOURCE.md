@@ -12,7 +12,7 @@ The file was made from the user's three supplied downloads, which were aligned b
 | `Bond_TR` | `Nifty 10 Yr Benchmark G-Sec.csv` | `Close` | 2,749 | `1588923760ba49beec99a4cde949063644172d057c6ba42a3db8ff79dffc4317` |
 | `Gold_TR` | `Nippon India ETF Gold BeES.csv` | `NAV` | 2,777 | `987e00b351d7af300458a98b70eb9c178be956d17544f0780b7f2512e2a0a45f` |
 
-The prepared sample SHA-256 is `26ea58b3cc57cbfc7c1cda30bd789e884c15f8ff3ce3b21e8b813c2b03b492b1`.
+The original locally aligned output SHA-256 is `26ea58b3cc57cbfc7c1cda30bd789e884c15f8ff3ce3b21e8b813c2b03b492b1`. The deployed public copy's SHA-256, shown in the app's Data and method tab, is `979699d0789ff3168bd40e9412838d1c9f6306f0593455e41fa9aa0905bf5c41`. The CSV observations are unchanged; the byte-level hash differs because the published text file has a different line-ending serialization.
 
 ## Gold BeES unit adjustment
 
