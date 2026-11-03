@@ -8,8 +8,8 @@ An India-focused research application for forecasting a future high-volatility e
 - The local research workspace contains a prepared sample and saved analysis outputs. The input data, source manifest, research archives and generated results are excluded from GitHub.
 - In the local workspace, the app can restore saved outputs when the prepared sample and evaluation settings match. A clean GitHub clone has no bundled sample: upload an authorized CSV and run the analysis there.
 - Dashboard plots thin long daily histories for browser responsiveness; model calculations and downloaded regime/forecast/portfolio files retain the complete daily series. The regime plot keeps regime changes and every higher-volatility cluster point visible.
-- A Streamlit Community Cloud app is deployed and has been verified to load. It is currently private, and the GitHub repository remains private.
-- Permission to publish or redistribute the raw market data in a public app or repository was not established.
+- The Streamlit Community Cloud app and GitHub repository are public. The hosted app shows the CSV-upload workflow; it contains no market data, source manifest or saved results.
+- Permission to publish or redistribute the raw market data was not established. The public app and repository contain code and documentation only; viewers must upload a CSV whose terms allow hosted use.
 - Historical results are research outputs, not investment advice or a promise of future performance.
 
 ## Run locally on Windows
@@ -20,7 +20,7 @@ Use Python 3.12 or a compatible version for the pinned packages. From the projec
 python -m streamlit run app.py
 ```
 
-Open `http://127.0.0.1:8501` on the same computer. This is a local demo address, not a public deployment URL. The presentation's app link points here while the app is running; replace it only after a real deployment URL has been issued and verified.
+Open `http://127.0.0.1:8501` on the same computer. This is a local demo address, not a public deployment URL. The presentation links to the hosted Streamlit app below; use that address for a remote demonstration. The local address works only on this computer.
 
 For a fresh Python installation that includes `ensurepip`, create an environment and install the pinned packages:
 
@@ -90,5 +90,5 @@ For a first study run, aim for at least ten years of aligned daily observations.
 
 ## Deployment
 
-The [live Streamlit app](https://financial-risk-intelligence-mfzjzfwa4itnzspf3r5skz.streamlit.app/) is currently private. The GitHub repository is also private. The app was verified to load its CSV-upload workflow; it does not contain the collected market data, source manifest, or saved results. Upload only a CSV whose provider terms and permissions allow hosted-app use. See [`DEPLOYMENT.md`](DEPLOYMENT.md) for the current deployment details and audience-access options.
+The [live Streamlit app](https://financial-risk-intelligence-mfzjzfwa4itnzspf3r5skz.streamlit.app/) is public, and the [GitHub source repository](https://github.com/prabhatseemasingh/financial-risk-intelligence) is public. The app was verified to load its CSV-upload workflow; neither the app nor repository contains the collected market data, source manifest, or saved results. Upload only a CSV whose provider terms and permissions allow hosted-app use. See [`DEPLOYMENT.md`](DEPLOYMENT.md) for deployment details.
 
