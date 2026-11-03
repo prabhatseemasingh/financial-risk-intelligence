@@ -8,6 +8,8 @@ from pathlib import Path
 
 import pandas as pd
 
+PROJECT = Path(__file__).resolve().parent
+
 
 def sha256_file(path: Path) -> str:
     digest = hashlib.sha256()
@@ -112,8 +114,10 @@ def main() -> None:
     args = parser.parse_args()
     if args.vix_file and not (args.vix_date and args.vix_value):
         parser.error("--vix-date and --vix-value are required when --vix-file is supplied.")
+    destination = Path(args.output).resolve()
+    if not destination.is_relative_to(PROJECT.resolve()):
+        parser.error("--output must point to a file inside the project folder.")
     output, manifest = merge_sources(args)
-    destination = Path(args.output)
     destination.parent.mkdir(parents=True, exist_ok=True)
     manifest_path = destination.with_suffix(".manifest.json")
     output.to_csv(destination, index=False, date_format="%Y-%m-%d")
@@ -128,4 +132,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
