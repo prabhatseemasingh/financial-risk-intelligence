@@ -8,7 +8,7 @@ An India-focused research application for forecasting a future high-volatility e
 - The local research workspace contains a prepared sample and saved analysis outputs. The input data, source manifest, research archives and generated results are excluded from GitHub.
 - In the local workspace, the app can restore saved outputs when the prepared sample and evaluation settings match. A clean GitHub clone has no bundled sample: upload an authorized CSV and run the analysis there.
 - Dashboard plots thin long daily histories for browser responsiveness; model calculations and downloaded regime/forecast/portfolio files retain the complete daily series. The regime plot keeps regime changes and every higher-volatility cluster point visible.
-- No application is deployed and no live URL is configured.
+- A Streamlit Community Cloud app is deployed and has been verified to load. It is currently private, and the GitHub repository remains private.
 - Permission to publish or redistribute the raw market data in a public app or repository was not established.
 - Historical results are research outputs, not investment advice or a promise of future performance.
 
@@ -90,5 +90,5 @@ For a first study run, aim for at least ten years of aligned daily observations.
 
 ## Deployment
 
-The repository is prepared as a code-only package: it does not contain the collected data or saved results. A deployed copy therefore asks viewers to upload an authorized CSV before running an analysis. Do not upload or redistribute market data until the applicable provider terms and permissions allow it. No deployment has been performed, and no live URL is configured. See [`DEPLOYMENT.md`](DEPLOYMENT.md) for the GitHub and Streamlit steps. Add a real, verified app URL to the PowerPoint only after the host assigns it.
+The [live Streamlit app](https://financial-risk-intelligence-mfzjzfwa4itnzspf3r5skz.streamlit.app/) is currently private. The GitHub repository is also private. The app was verified to load its CSV-upload workflow; it does not contain the collected market data, source manifest, or saved results. Upload only a CSV whose provider terms and permissions allow hosted-app use. See [`DEPLOYMENT.md`](DEPLOYMENT.md) for the current deployment details and audience-access options.
 
