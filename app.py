@@ -22,13 +22,11 @@ st.set_page_config(
 )
 
 PROJECT_DIR = Path(__file__).resolve().parent
-LOCAL_PREPARED_DATA_PATH = PROJECT_DIR / "data" / "processed" / "market_data_aligned.csv"
 PUBLIC_SAMPLE_DATA_PATH = PROJECT_DIR / "data" / "default_project_sample.csv"
-PREPARED_DATA_PATH = (
-    LOCAL_PREPARED_DATA_PATH
-    if LOCAL_PREPARED_DATA_PATH.is_file()
-    else PUBLIC_SAMPLE_DATA_PATH
-)
+PREPARED_DATA_PATH = PUBLIC_SAMPLE_DATA_PATH
+MAX_UPLOAD_MB = 10
+MAX_UPLOAD_ROWS = 10_000
+MAX_UPLOAD_COLUMNS = 50
 PREPARED_SOURCE_NOTE = (
     "NIFTY 50 Gross TRI, Nifty 10 Yr Benchmark G-Sec, and split-adjusted Gold BeES Growth NAV; "
     "exact common trading dates; Gold BeES pre-2019-12-23 NAV divided by 100 per NSE circular CML42873; "
@@ -172,8 +170,10 @@ with st.sidebar:
         "Upload a CSV of daily index or adjusted-price levels",
         type=["csv"],
         disabled=use_prepared_data,
-        help="Use daily observations. Do not upload generated or interpolated market data.",
+        max_upload_size=MAX_UPLOAD_MB,
+        help=f"One combined CSV, up to {MAX_UPLOAD_MB} MB and {MAX_UPLOAD_ROWS:,} data rows. Use daily observations; do not upload generated or interpolated market data.",
     )
+    st.caption("Only the sample or CSV you select is sent to Streamlit for analysis. This code does not scan your device or save uploads to disk or GitHub. Do not upload personal or sensitive files.")
     st.markdown(
         "Required series: equity total-return level, government-bond total-return level, "
         "and an adjusted domestic-gold proxy level. India VIX is optional."
@@ -208,12 +208,21 @@ with st.sidebar:
             st.error(f"Could not load the prepared project data: {exc}")
     elif uploaded is not None:
         raw_bytes = uploaded.getvalue()
-        upload_hash = hashlib.sha256(raw_bytes).hexdigest()
-        input_name = uploaded.name
-        try:
-            raw = pd.read_csv(BytesIO(raw_bytes))
-        except Exception as exc:  # Show a useful file-specific error in the interface.
-            st.error(f"Could not read this CSV: {exc}")
+        input_name = uploaded.name.replace("\\", "/").rsplit("/", 1)[-1]
+        if len(raw_bytes) > MAX_UPLOAD_MB * 1024 * 1024:
+            st.error(f"The CSV is larger than the {MAX_UPLOAD_MB} MB limit.")
+        else:
+            upload_hash = hashlib.sha256(raw_bytes).hexdigest()
+            try:
+                raw = pd.read_csv(BytesIO(raw_bytes), nrows=MAX_UPLOAD_ROWS + 1)
+                if len(raw) > MAX_UPLOAD_ROWS:
+                    raw = None
+                    st.error(f"The CSV exceeds the {MAX_UPLOAD_ROWS:,}-row limit. Prepare a smaller daily history and upload it again.")
+                elif len(raw.columns) > MAX_UPLOAD_COLUMNS:
+                    raw = None
+                    st.error(f"The CSV has more than {MAX_UPLOAD_COLUMNS} columns. Upload only the required market series and optional India VIX.")
+            except Exception as exc:  # Show a useful file-specific error in the interface.
+                st.error(f"Could not read this CSV: {exc}")
 
     if raw is not None and not raw.empty:
         columns = list(raw.columns)
@@ -568,4 +577,3 @@ with tabs[4]:
 
 st.divider()
 st.caption("Research prototype. Verify data rights and assumptions. Historical results do not predict future performance.")
-
