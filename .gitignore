@@ -12,9 +12,26 @@ __pycache__/
 .env
 .env.*
 !.env.example
+.netrc
+.npmrc
+.pypirc
+.aws/
+.ssh/
+.config/gcloud/
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+service-account*.json
 /CLAUDE_CONTEXT_BUNDLE.txt
 
-# Local data and analysis outputs. Keep only documentation/template files.
+# Data files are private by default. These two root-level files are intentional public assets.
+/data/**/*.csv
+!/data/default_project_sample.csv
+!/data/market_data_template.csv
+
+# Local data and analysis outputs.
 /data/raw/
 /data/processed/
 /data/research_inputs/
@@ -26,4 +43,3 @@ __pycache__/
 .DS_Store
 Thumbs.db
 desktop.ini
-
