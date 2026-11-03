@@ -1,6 +1,8 @@
 # Data folder
 
-`market_data_template.csv` contains the expected column names and no observations. User-provided inputs, processed datasets, source manifests and research archives are kept locally and excluded from the GitHub repository.
+- `default_project_sample.csv` is the 2,709-row prepared dataset loaded by default in the public Streamlit app. It covers 2015-11-02 to 2026-10-30.
+- `market_data_template.csv` is an empty CSV template for uploads.
+- `DEFAULT_SAMPLE_SOURCE.md` documents the source series, exact-date alignment, exclusions, Gold BeES split adjustment, provenance fingerprints, and limitations.
 
-To run an analysis, prepare an authorized daily CSV with an equity total-return level, an Indian government-bond total-return level, and a documented domestic-gold proxy level in INR. India VIX is optional. Use the preparation scripts to align dates exactly; never create rows to fill missing market history. Check the data provider's terms before storing, uploading to a hosted app, or redistributing a series.
+Local processed data, original source exports, source manifests, research archives and analysis outputs are kept out of the public repository. For new uploads, provide an equity total-return level, an Indian government-bond return level, and an adjusted domestic-gold proxy level in INR. India VIX is optional. The app does not fill missing observations or fetch live market data.
 
