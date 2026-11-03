@@ -8,6 +8,8 @@ The repository includes `data/default_project_sample.csv`, an aligned common-dat
 
 The original three provider exports, local source manifest, research archives, saved run outputs, local environments and credentials are excluded. The application calculates its output from the prepared data; it does not hard-code saved performance results or fetch live market prices.
 
+The hosted app reads its bundled sample and the single CSV a visitor explicitly selects for upload. Its code does not scan the visitor's device, open other local paths, execute uploaded content, or save uploaded CSVs to disk or GitHub. The selected CSV is sent to Streamlit Community Cloud for analysis. Do not upload personal or sensitive files. The uploader limits files to 10 MB, 10,000 data rows and 50 columns. The app's code cannot set or verify Streamlit's separate service-level data-retention practices.
+
 ## What a visitor sees
 
 1. Opening the public app loads the prepared sample and starts the walk-forward model analysis automatically.
@@ -24,7 +26,7 @@ The app sorts valid observations, rejects duplicate dates, excludes rows with mi
 - Visibility: public; the app does not require visitors to sign in
 - Default input: `data/default_project_sample.csv`
 
-GitHub changes to `main` trigger the connected Streamlit app to rebuild. After each change, wait for the deployment to finish and open the public app to verify the result. Do not share `http://127.0.0.1:8501` as it is available only on the computer running the local app.
+GitHub changes to `main` trigger the connected Streamlit app to rebuild. After each change, wait for the deployment to finish and open the public app to verify the result. Do not share the local address displayed by Streamlit, since it only works on the computer running that local app.
 
 ## Run locally
 
@@ -38,7 +40,6 @@ python -m pip install -r requirements.txt
 python -m streamlit run app.py
 ```
 
-The application opens at `http://127.0.0.1:8501` on that computer. The same default sample and upload workflow are available.
+Streamlit opens the application in a browser on that computer. The same default sample and upload workflow are available.
 
 For host-specific details, see Streamlit's [deployment guide](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy) and [dependency guide](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/app-dependencies).
-
