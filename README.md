@@ -14,7 +14,7 @@ An India-focused research application for forecasting a future high-volatility e
 
 ## Run locally on Windows
 
-Use Python 3.13.7 or another compatible Python 3.12+ environment. This desktop already has the pinned packages, so from this folder run:
+Use Python 3.12 or a compatible version for the pinned packages. From the project folder, install requirements.txt and run the app:
 
 ```powershell
 python -m streamlit run app.py
@@ -66,10 +66,6 @@ Replace file paths and column names with the actual downloaded files. Inspect th
 - RBI's [Database on Indian Economy](https://dbie.rbi.org.in/) is a source to review for supplemental official Indian financial series.
 - For gold, select an official or otherwise authorized domestic-gold series. If using an NSE-listed gold ETF, download daily prices from its ETF archive, adjust for corporate actions, and document the ETF symbol, currency, adjustment method and retrieval date. Record exact series, source terms and transformations in the app's source note.
 - The app does not download data automatically. Check each provider's access and reuse terms before downloading, storing, deploying or sharing data.
-
-### Downloaded research candidates
-
-The project includes CC BY 4.0 research datasets for NIFTY 50 price levels/returns, fixed-income indices, and a commodity workbook. They do not satisfy the flagship input requirements as verified: the NIFTY equity series is a price index rather than TRI; its source page's stated start date differs from the first date in the downloaded CSV; the commodity workbook does not identify the gold series' provider, unit, or adjustment method; and the NIFTY datasets say they were downloaded from NSE, whose current terms prohibit use of NSE website data for simulation without permission. These candidates are retained for source review, not supplied to the model. See [`data/research_inputs/README.md`](data/research_inputs/README.md) for the audit counts, limitations, and archive checksums.
 
 For a first study run, aim for at least ten years of aligned daily observations. The default design uses a three-year final holdout, three one-year development folds, 21-session forward labels, and a 21-session purge. The exact data history depends on series availability and licensing; inspect the aligned date range before committing to this design. If the app reports insufficient history, obtain more data or get supervisor approval before changing the windows.
 

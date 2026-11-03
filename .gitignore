@@ -1,0 +1,29 @@
+# Python environments and generated caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local credentials and configuration
+.streamlit/secrets.toml
+.env
+.env.*
+!.env.example
+/CLAUDE_CONTEXT_BUNDLE.txt
+
+# Local data and analysis outputs. Keep only documentation/template files.
+/data/raw/
+/data/processed/
+/data/research_inputs/
+/results/
+/models/
+/reports/generated/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+desktop.ini
+
