@@ -28,7 +28,6 @@ The user confirmed that this prepared sample may be hosted and used by the publi
 
 ## Reproduction
 
-The original three exports are not included in this repository. To reproduce the aligned CSV, obtain the same series and use `prepare_collected_data.py` with the appropriate file paths. The transformation code uses exact common dates and applies the stated Gold BeES unit adjustment. The SHA-256 values above can be used to identify matching source files. Check the current provider terms and permissions before using any replacement files.
+The original three exports are not included in this repository. To reproduce the aligned CSV, obtain the same series and pass the three explicit file paths to `prepare_collected_data.py` with `--gold`, `--equity`, and `--bond`. The script does not search the computer and only writes output inside the project directory. The transformation code uses exact common dates and applies the stated Gold BeES unit adjustment. The SHA-256 values above can be used to identify matching source files. Check the current provider terms and permissions before using any replacement files.
 
 Primary source references: [NSE historical reports](https://www.nseindia.com/resources/historical-reports-capital-market-daily-monthly-archives), [Nifty Indices historical data](https://www.niftyindices.com/reports/historical-data), [NIFTY indices FAQ](https://www.nseindia.com/static/products-services/indices-faqs), and [NSE circular CML42873](https://archives.nseindia.com/content/circulars/CML42873.pdf).
-
