@@ -55,7 +55,14 @@ html, body, [class*="css"] { font-family: "Segoe UI", system-ui, sans-serif; }
 [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2,
 [data-testid="stSidebar"] h3, [data-testid="stSidebar"] label,
 [data-testid="stSidebar"] p { color: #e9f0f4; }
-[data-testid="stSidebar"] [data-testid="stCaptionContainer"] { color: #b9c9d3; }
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h2 {
+  padding-bottom: .55rem;
+  color: #f0c66c;
+  border-bottom: 1px solid rgba(240,198,108,.28);
+  font-family: Georgia, "Palatino Linotype", serif;
+  font-size: 1.15rem;
+}
+[data-testid="stSidebar"] [data-testid="stCaptionContainer"] { color: #d4dee6; }
 [data-testid="stSidebar"] div[data-baseweb="select"] > div {
   background: #fff;
   border-color: #d8d0c2;
@@ -68,10 +75,33 @@ html, body, [class*="css"] { font-family: "Segoe UI", system-ui, sans-serif; }
   border-radius: 7px;
 }
 [data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] {
-  background: rgba(255,255,255,.045);
-  border: 1px dashed rgba(233,240,244,.4);
-  border-radius: 8px;
+  background: rgba(255,255,255,.065);
+  border: 1px dashed rgba(240,198,108,.72);
+  border-radius: 7px;
 }
+[data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] * { color: #f2f0e9 !important; }
+[data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] button {
+  background: #f0e5c9 !important;
+  border: 1px solid #dcc68f !important;
+  border-radius: 5px !important;
+}
+[data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] button * { color: #202b45 !important; }
+[data-testid="stSidebar"] [data-testid="stDownloadButton"] > button {
+  width: 100%;
+  color: #202b45 !important;
+  background: #f0e5c9 !important;
+  border: 1px solid #dcc68f !important;
+  border-radius: 6px !important;
+  font-weight: 650;
+}
+[data-testid="stSidebar"] [data-testid="stDownloadButton"] > button * { color: #202b45 !important; }
+[data-testid="stSidebar"] [data-testid="stDownloadButton"] > button:hover {
+  color: #fffefa !important;
+  background: #0d6863 !important;
+  border-color: #0d6863 !important;
+}
+[data-testid="stSidebar"] [data-testid="stDownloadButton"] > button:hover * { color: #fffefa !important; }
+[data-testid="stSidebar"] [data-testid="stWidgetLabel"] { color: #f3f1e9; }
 
 .fr-hero {
   position: relative;
@@ -183,7 +213,17 @@ h2, h3 { color: var(--fr-indigo); letter-spacing: -.02em; }
   font-size: .81rem;
   font-weight: 650;
 }
-[data-testid="stMetricValue"] { color: var(--fr-ink); font-weight: 730; }
+[data-testid="stMetricValue"],
+[data-testid="stMetricValue"] div,
+[data-testid="stMetricValue"] p {
+  max-width: 100%;
+  color: var(--fr-ink);
+  font-size: clamp(1.2rem, 1.8vw, 1.85rem);
+  font-weight: 730;
+  line-height: 1.15;
+  white-space: normal !important;
+  overflow-wrap: anywhere;
+}
 
 [data-testid="stTabs"] [data-baseweb="tab-list"] {
   gap: .2rem;
@@ -416,13 +456,15 @@ with st.sidebar:
         help="Loads the aligned common-date project CSV. Uncheck this option to upload a newer CSV.",
     )
     uploaded = st.file_uploader(
-        "Upload a CSV of daily index or adjusted-price levels",
+        "Upload a CSV of daily market levels",
         type=["csv"],
         disabled=use_prepared_data,
         max_upload_size=MAX_UPLOAD_MB,
         help=f"One combined CSV, up to {MAX_UPLOAD_MB} MB and {MAX_UPLOAD_ROWS:,} data rows. Use daily observations; do not upload generated or interpolated market data.",
     )
     st.caption("Only the sample or CSV you select is sent to Streamlit for analysis. This code does not scan your device or save uploads to disk or GitHub. Do not upload personal or sensitive files.")
+    if use_prepared_data:
+        st.caption("Prepared project data is active. To upload a newer file, uncheck the sample above.")
     st.markdown(
         "Required series: equity total-return level, government-bond total-return level, "
         "and an adjusted domestic-gold proxy level. India VIX is optional."
@@ -542,6 +584,7 @@ with st.sidebar:
             if rights_confirmed and not source_note.strip():
                 st.info("Enter a short source note before running the research pipeline.")
 
+    st.divider()
     st.header("02 · Evaluation settings")
     holdout_choice = st.selectbox("Final holdout", ["3 years (756 sessions)", "2 years (504 sessions)"], index=0)
     holdout_sessions = 756 if holdout_choice.startswith("3") else 504
@@ -689,7 +732,11 @@ with tabs[0]:
         latest_cols = st.columns(3)
         latest_cols[0].metric("Latest high-risk probability", f"{result.current_probability:.1%}")
         latest_cols[1].metric("Forecast uses data through", result.current_features_date.strftime("%d %b %Y"))
-        latest_cols[2].metric("Selected model family", result.selected_model)
+        latest_cols[2].metric(
+            "Selected model",
+            result.selected_model,
+            help="Full model family selected using chronological development folds.",
+        )
         st.caption(
             f"The forecast uses features through {result.current_features_date:%Y-%m-%d}; training uses only forward labels "
             "whose full 21-session windows were observed by the latest input date. It is separate from final-holdout scores."
