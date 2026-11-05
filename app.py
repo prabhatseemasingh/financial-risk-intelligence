@@ -16,10 +16,219 @@ from risk_intelligence.portfolio import weights_from_probability
 
 st.set_page_config(
     page_title="Financial Risk Intelligence",
-    page_icon="📈",
+    page_icon="◈",
     layout="wide",
     initial_sidebar_state="expanded",
 )
+
+APP_THEME_CSS = """
+<style>
+:root {
+  --fr-ink: #14232e;
+  --fr-navy: #0f2a3d;
+  --fr-teal: #1f8a8a;
+  --fr-gold: #f2a541;
+  --fr-muted: #617487;
+  --fr-line: #dce5eb;
+  --fr-surface: #ffffff;
+  --fr-canvas: #f3f6f9;
+}
+
+html, body, [class*="css"] { font-family: "Segoe UI", system-ui, sans-serif; }
+[data-testid="stAppViewContainer"] { background: var(--fr-canvas); }
+[data-testid="stHeader"] { background: transparent; }
+[data-testid="stMainBlockContainer"] {
+  max-width: 1480px;
+  padding-top: 1.5rem;
+  padding-bottom: 3rem;
+}
+
+[data-testid="stSidebar"] {
+  background: linear-gradient(180deg, #14232e 0%, #0f2a3d 100%);
+  border-right: 1px solid rgba(255,255,255,.08);
+}
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"],
+[data-testid="stSidebar"] [data-testid="stWidgetLabel"],
+[data-testid="stSidebar"] [data-testid="stCaptionContainer"],
+[data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2,
+[data-testid="stSidebar"] h3, [data-testid="stSidebar"] label,
+[data-testid="stSidebar"] p { color: #e9f0f4; }
+[data-testid="stSidebar"] [data-testid="stCaptionContainer"] { color: #b9c9d3; }
+[data-testid="stSidebar"] div[data-baseweb="select"] > div {
+  background: #fff;
+  border-color: #cbd8e1;
+  border-radius: 10px;
+}
+[data-testid="stSidebar"] div[data-baseweb="select"] * { color: var(--fr-ink); }
+[data-testid="stSidebar"] input, [data-testid="stSidebar"] textarea {
+  color: var(--fr-ink);
+  background: #fff;
+  border-radius: 9px;
+}
+[data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] {
+  background: rgba(255,255,255,.07);
+  border: 1px dashed rgba(221,238,247,.48);
+  border-radius: 12px;
+}
+
+.fr-hero {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem 2.2rem;
+  margin: .2rem 0 1.2rem;
+  color: #f5f8fa;
+  background: linear-gradient(118deg, #14232e 0%, #0f2a3d 68%, #174b57 100%);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 22px;
+  box-shadow: 0 14px 36px rgba(20,35,46,.14);
+}
+.fr-hero:after {
+  content: "";
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  right: 14%;
+  top: -180px;
+  border: 1px solid rgba(115,208,197,.19);
+  border-radius: 50%;
+  box-shadow: 0 0 0 28px rgba(115,208,197,.035), 0 0 0 58px rgba(115,208,197,.025);
+  pointer-events: none;
+}
+.fr-hero-copy, .fr-hero-mark { position: relative; z-index: 1; }
+.fr-hero-eyebrow {
+  margin-bottom: .65rem;
+  color: #9ed8d1;
+  font-size: .73rem;
+  font-weight: 750;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.fr-hero h1 {
+  margin: 0;
+  color: #f6f9fb;
+  font-size: clamp(1.9rem, 3vw, 2.8rem);
+  font-weight: 740;
+  letter-spacing: -.045em;
+  line-height: 1.12;
+}
+.fr-hero-copy p {
+  max-width: 760px;
+  margin: .75rem 0 0;
+  color: #d1dce3;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+.fr-hero-mark {
+  min-width: 190px;
+  padding: 1rem 1.1rem;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 15px;
+  backdrop-filter: blur(8px);
+}
+.fr-hero-mark strong { display: block; color: #fff; font-size: .94rem; }
+.fr-hero-mark span { color: #c4d2db; font-size: .78rem; }
+.fr-hero-mark i {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: .45rem;
+  background: #72d0c1;
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px rgba(114,208,193,.14);
+}
+
+h2, h3 { color: var(--fr-ink); letter-spacing: -.025em; }
+[data-testid="stSubheader"] { padding-top: .2rem; }
+[data-testid="stMetric"] {
+  min-height: 112px;
+  padding: 1rem 1.1rem;
+  background: var(--fr-surface);
+  border: 1px solid var(--fr-line);
+  border-top: 3px solid var(--fr-teal);
+  border-radius: 14px;
+  box-shadow: 0 5px 16px rgba(20,35,46,.045);
+}
+[data-testid="stMetricLabel"] p {
+  color: var(--fr-muted);
+  font-size: .81rem;
+  font-weight: 650;
+}
+[data-testid="stMetricValue"] { color: var(--fr-ink); font-weight: 730; }
+
+[data-testid="stTabs"] [data-baseweb="tab-list"] {
+  gap: .35rem;
+  padding: .38rem;
+  background: #e8eef3;
+  border: 1px solid #dde6ec;
+  border-radius: 14px;
+}
+[data-testid="stTabs"] [data-baseweb="tab"] {
+  height: 2.75rem;
+  padding: 0 1rem;
+  color: #526779;
+  background: transparent;
+  border-radius: 10px;
+  font-weight: 650;
+}
+[data-testid="stTabs"] [data-baseweb="tab"][aria-selected="true"] {
+  color: var(--fr-navy);
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(20,35,46,.09);
+}
+[data-testid="stTabs"] [data-baseweb="tab-highlight"] { background: var(--fr-teal); }
+[data-testid="stTabs"] [data-testid="stTabContent"] {
+  margin-top: .65rem;
+  padding: 1.2rem 1.25rem 1.35rem;
+  background: #fff;
+  border: 1px solid var(--fr-line);
+  border-radius: 16px;
+  box-shadow: 0 5px 16px rgba(20,35,46,.035);
+}
+
+[data-testid="stDataFrame"], [data-testid="stTable"] {
+  overflow: hidden;
+  border: 1px solid var(--fr-line);
+  border-radius: 12px;
+}
+[data-testid="stAlert"] { border-radius: 12px; }
+[data-testid="stVerticalBlock"] > [data-testid="stElementContainer"] { scroll-margin-top: 1rem; }
+div.stButton > button, div.stDownloadButton > button {
+  min-height: 2.6rem;
+  border-radius: 10px;
+  font-weight: 650;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+div.stButton > button[kind="primary"] {
+  color: #fff;
+  background: var(--fr-teal);
+  border: 1px solid var(--fr-teal);
+  box-shadow: 0 5px 12px rgba(31,138,138,.18);
+}
+div.stButton > button:hover, div.stDownloadButton > button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 7px 16px rgba(20,35,46,.12);
+}
+a { color: #176e78; }
+hr { border-color: var(--fr-line); }
+
+@media (max-width: 760px) {
+  [data-testid="stMainBlockContainer"] { padding: 1rem 1rem 2rem; }
+  .fr-hero { grid-template-columns: 1fr; padding: 1.5rem; border-radius: 17px; }
+  .fr-hero-mark { display: none; }
+  [data-testid="stTabs"] [data-baseweb="tab-list"] { overflow-x: auto; }
+  [data-testid="stTabs"] [data-baseweb="tab"] { padding: 0 .75rem; white-space: nowrap; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *:before, *:after { scroll-behavior: auto !important; transition: none !important; }
+}
+</style>
+"""
+st.markdown(APP_THEME_CSS, unsafe_allow_html=True)
 
 PROJECT_DIR = Path(__file__).resolve().parent
 PUBLIC_SAMPLE_DATA_PATH = PROJECT_DIR / "data" / "default_project_sample.csv"
@@ -150,16 +359,29 @@ def chart_sample(frame: pd.DataFrame, max_rows: int = 400) -> pd.DataFrame:
     return frame.iloc[sorted(positions)]
 
 
-st.title("Financial Risk Intelligence")
-st.caption("Research prototype for high-volatility forecasting and risk-responsive portfolio evaluation")
-st.warning(
-    "Educational research tool only. It does not provide investment advice, execute trades, "
-    "or guarantee future performance. The aligned project sample is loaded by default; new uploads "
-    "refresh the analysis for your session only."
+st.markdown(
+    """
+    <section class="fr-hero" aria-label="Financial Risk Intelligence research dashboard">
+      <div class="fr-hero-copy">
+        <div class="fr-hero-eyebrow">Quantitative finance · Research dashboard</div>
+        <h1>Financial Risk Intelligence</h1>
+        <p>Read changing market conditions, assess upcoming volatility risk, and explore how a portfolio rule responds.</p>
+      </div>
+      <div class="fr-hero-mark" aria-label="Research prototype">
+        <strong><i></i>Research workspace</strong>
+        <span>Walk-forward analysis · India markets</span>
+      </div>
+    </section>
+    """,
+    unsafe_allow_html=True,
+)
+st.info(
+    "Educational research prototype. Results are based on the selected historical data; this app does not provide investment advice, execute trades, or guarantee future performance."
 )
 
 with st.sidebar:
-    st.header("1. Add verified data")
+    st.header("01 · Market data")
+    st.caption("Choose the prepared sample or map an authorized daily CSV.")
     use_prepared_data = st.checkbox(
         "Use the prepared project sample (2015–2026)",
         value=PREPARED_DATA_PATH.is_file(),
@@ -293,7 +515,7 @@ with st.sidebar:
             if rights_confirmed and not source_note.strip():
                 st.info("Enter a short source note before running the research pipeline.")
 
-    st.header("2. Evaluation settings")
+    st.header("02 · Evaluation settings")
     holdout_choice = st.selectbox("Final holdout", ["3 years (756 sessions)", "2 years (504 sessions)"], index=0)
     holdout_sessions = 756 if holdout_choice.startswith("3") else 504
     validation_choice = st.selectbox("Development validation block", ["1 year (252 sessions)", "6 months (126 sessions)"], index=0)
@@ -303,7 +525,7 @@ with st.sidebar:
     st.caption("These are research assumptions. Agree on them before interpreting results.")
     st.caption("After data and source confirmation, analysis refreshes automatically when the file, column mapping, or settings change. Uploaded files are processed for this session and do not replace the shared sample.")
     run_clicked = st.button(
-        "Run / refresh walk-forward analysis",
+        "Run walk-forward analysis",
         type="primary",
         disabled=prices is None or not source_note.strip(),
     )
@@ -409,9 +631,9 @@ if prices is None or report is None:
     st.stop()
 
 report_cols = st.columns(4)
-report_cols[0].metric("Aligned daily rows", f"{report.rows_used:,}")
-report_cols[1].metric("First date", report.start_date.strftime("%Y-%m-%d"))
-report_cols[2].metric("Last date", report.end_date.strftime("%Y-%m-%d"))
+report_cols[0].metric("Aligned observations", f"{report.rows_used:,}")
+report_cols[1].metric("Sample begins", report.start_date.strftime("%d %b %Y"))
+report_cols[2].metric("Sample ends", report.end_date.strftime("%d %b %Y"))
 report_cols[3].metric("Rows excluded", f"{report.rows_dropped:,}")
 if showing_saved_analysis:
     st.info("Showing the saved default walk-forward run for the selected sample and settings. Click **Run walk-forward analysis** to recompute it.")
@@ -425,7 +647,8 @@ if report.missing_optional:
 tabs = st.tabs(["Overview", "Regimes", "Risk forecast", "Portfolio", "Data and method"])
 
 with tabs[0]:
-    st.subheader("Market observations")
+    st.subheader("Market history at a glance")
+    st.caption("Compare the long-run movement of the three aligned asset series.")
     levels = prices[["Equity_TR", "Bond_TR", "Gold_TR"]].copy()
     normalized = levels.div(levels.iloc[0]).mul(100)
     st.line_chart(chart_sample(normalized), height=320)
@@ -437,16 +660,17 @@ with tabs[0]:
             st.info("The analysis is starting for this data and these settings. It will rerun automatically when they change.")
     else:
         latest_cols = st.columns(3)
-        latest_cols[0].metric("Current high-risk probability", f"{result.current_probability:.1%}")
-        latest_cols[1].metric("Forecast as of", result.current_features_date.strftime("%Y-%m-%d"))
-        latest_cols[2].metric("Model family selected on development folds", result.selected_model)
+        latest_cols[0].metric("Latest high-risk probability", f"{result.current_probability:.1%}")
+        latest_cols[1].metric("Forecast uses data through", result.current_features_date.strftime("%d %b %Y"))
+        latest_cols[2].metric("Selected model family", result.selected_model)
         st.caption(
             f"The forecast uses features through {result.current_features_date:%Y-%m-%d}; training uses only forward labels "
             "whose full 21-session windows were observed by the latest input date. It is separate from final-holdout scores."
         )
 
 with tabs[1]:
-    st.subheader("Descriptive volatility regimes")
+    st.subheader("Market regimes")
+    st.caption("Historical clusters group days with similar volatility characteristics; they describe past conditions.")
     live_regime_error = getattr(result, "regime_error", None) if result is not None else None
     if live_regime_error:
         st.warning(f"The latest clustering attempt could not complete: {live_regime_error}")
@@ -484,7 +708,9 @@ with tabs[1]:
                 "and then assigned across the available history. Run the analysis to refit for new settings or data."
             )
         latest_regime = regime_frame.iloc[-1]
-        st.write(f"Latest descriptive cluster: **{latest_regime['regime']}**")
+        regime_cols = st.columns(2)
+        regime_cols[0].metric("Latest historical regime", str(latest_regime["regime"]))
+        regime_cols[1].metric("Trailing 21-session volatility", f"{latest_regime['equity_vol_21']:.1%}")
         st.download_button(
             "Download full daily regime assignments as CSV",
             regime_frame.to_csv(index_label="Date").encode("utf-8"),
@@ -493,7 +719,8 @@ with tabs[1]:
         )
 
 with tabs[2]:
-    st.subheader("Risk forecast evidence")
+    st.subheader("Risk forecast")
+    st.caption("See how candidate models were selected and how the chosen model performed on later observations.")
     if result is None:
         st.info("Run the analysis to compare candidate models on development folds and evaluate the selected family on the final holdout.")
     else:
@@ -521,7 +748,8 @@ with tabs[2]:
         )
 
 with tabs[3]:
-    st.subheader("Portfolio comparison")
+    st.subheader("Portfolio allocation and comparison")
+    st.caption("Compare the risk-responsive allocation with simple reference strategies after the selected trading-cost assumption.")
     if result is None:
         st.info("Run the analysis to calculate monthly allocations and compare them with static baselines after transaction costs.")
     else:
@@ -536,8 +764,11 @@ with tabs[3]:
         st.dataframe(result.cost_sensitivity.style.format(precision=4), use_container_width=True, hide_index=True)
         latest_weights = result.portfolio_weights["Selected-model risk-responsive"].iloc[-1]
         weight_view = pd.DataFrame({"Latest held weight": latest_weights}).style.format("{:.1%}")
-        st.markdown("**Latest held allocation for the selected-model risk-responsive strategy**")
-        st.dataframe(weight_view, use_container_width=True)
+        st.markdown("**Latest held allocation · risk-responsive strategy**")
+        allocation_cols = st.columns([1.3, 1])
+        allocation_plot = latest_weights.rename_axis("Asset").rename("Weight").to_frame()
+        allocation_cols[0].bar_chart(allocation_plot, height=245)
+        allocation_cols[1].dataframe(weight_view, use_container_width=True)
         portfolio_export = result.portfolio_returns.join(result.portfolio_weights["Selected-model risk-responsive"].add_prefix("Weight "))
         st.download_button(
             "Download portfolio path and weights as CSV",
@@ -548,7 +779,8 @@ with tabs[3]:
         st.caption("Sharpe uses a zero risk-free proxy. VaR and CVaR are historical one-day loss estimates. Results depend on the uploaded sample and the stated cost assumption.")
 
 with tabs[4]:
-    st.subheader("Data provenance and method")
+    st.subheader("Data and method")
+    st.caption("Review what went into the analysis, how it was prepared, and where the source series came from.")
     st.write(f"**Source note:** {report.source_note or 'No source note supplied.'}")
     if upload_hash:
         st.write(f"**Input file:** {input_name or 'Uploaded CSV'}")
@@ -577,3 +809,4 @@ with tabs[4]:
 
 st.divider()
 st.caption("Research prototype. Verify data rights and assumptions. Historical results do not predict future performance.")
+
